@@ -1,0 +1,13 @@
+[package]
+name = "winapi-demo"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+native-windows-gui = "1.0.12"
+
+[dependencies.windows-sys]
+version = "0.48"
+features = ["Win32_System_Environment", "Win32_System_Registry", "Win32_Foundation"]
