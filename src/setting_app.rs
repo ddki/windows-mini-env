@@ -23,8 +23,6 @@ pub struct SettingApp {
 
 impl SettingApp {
     fn save(&self) {
-        // 环境变量选择列表
-        let key_select = self.key_select_input.text();
         // 添加右键菜单
         let add_right_click_menu =
             self.add_right_click_menu_input.check_state() == CheckBoxState::Checked;
