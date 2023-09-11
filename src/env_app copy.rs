@@ -3,7 +3,7 @@ use std::{cell::RefCell, ops::Deref, rc::Rc};
 
 use nwg::{CheckBoxState, NativeUi};
 use winreg::{
-    enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS},
+    enums::{HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS},
     RegKey,
 };
 
@@ -40,6 +40,9 @@ pub struct EnvNewApp {
 
 impl EnvNewApp {
     fn save(&self) {
+        // 转 u16
+        let key = self.key_input.text();
+        let key_select = self.key_select.selection_string().unwrap();
         let value = self.value_input.text();
 
         let is_system = self.is_system_input.check_state() == CheckBoxState::Checked;
@@ -55,11 +58,9 @@ impl EnvNewApp {
                 .unwrap();
             if is_new {
                 // 新建
-                let key = self.key_input.text();
                 let _ = cur_cer.set_value(key, &value);
             } else {
                 // 修改
-                let key_select = self.key_select.selection_string().unwrap();
                 let update_key = key_select.clone();
                 let old_value: String = cur_cer.get_value(key_select).unwrap();
                 let new_value = format!("{};{}", old_value, value);
@@ -69,17 +70,15 @@ impl EnvNewApp {
             // 用户环境变量
             const SUB_HKEY: &str = "Environment";
             // 打开注册表
-            let hklm = RegKey::predef(HKEY_CURRENT_USER);
+            let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
             let cur_cer = hklm
                 .open_subkey_with_flags(SUB_HKEY, KEY_ALL_ACCESS)
                 .unwrap();
             if is_new {
                 // 新建
-                let key = self.key_input.text();
                 let _ = cur_cer.set_value(key, &value);
             } else {
                 // 修改
-                let key_select = self.key_select.selection_string().unwrap();
                 let update_key = key_select.clone();
                 let old_value: String = cur_cer.get_value(key_select).unwrap();
                 let new_value = format!("{};{}", old_value, value);
