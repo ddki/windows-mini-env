@@ -7,21 +7,9 @@ use winreg::{
     RegKey,
 };
 
-#[derive(Debug, PartialEq)]
-pub enum OperateEnum {
-    NEW,
-    MODIFY,
-}
-
-impl Default for OperateEnum {
-    fn default() -> Self {
-        OperateEnum::MODIFY
-    }
-}
-
 #[derive(Default)]
 pub struct EnvNewApp {
-    pub operate: OperateEnum,
+    pub operate: String,
 
     window: nwg::Window,
     layout: nwg::GridLayout,
@@ -43,7 +31,7 @@ impl EnvNewApp {
         let value = self.value_input.text();
 
         let is_system = self.is_system_input.check_state() == CheckBoxState::Checked;
-        let is_new = self.operate == OperateEnum::NEW;
+        let is_new = self.operate == "new";
         if is_system {
             // 系统环境变量
             const SUB_HKEY: &str =
@@ -106,7 +94,7 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         // ui
         nwg::Window::builder()
             .flags(nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE)
-            .size((300, 140))
+            .size((400, 200))
             .position((300, 300))
             .title("设置环境变量")
             .build(&mut data.window)?;
@@ -135,9 +123,10 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
             .parent(&data.window)
             .build(&mut data.is_system_input)?;
 
-        let show_key_select = OperateEnum::MODIFY == data.operate;
+        let show_key_select = "modify" == data.operate;
         if show_key_select {
-            let env_keys: Vec<String> = std::env::vars().map(|(key, _)| key).collect();
+            let mut env_keys: Vec<String> = Vec::new();
+            env_keys.push("PATH".to_string());
             nwg::ComboBox::builder()
                 .collection(env_keys)
                 .selected_index(Some(0))
@@ -193,8 +182,9 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         if show_key_select {
             nwg::GridLayout::builder()
                 .parent(&ui.window)
-                .max_size([400, 200])
-                .min_size([80, 60])
+                .max_size([600, 300])
+                .min_size([200, 100])
+                .max_column(Some(2))
                 .child(0, 0, &ui.is_system_label)
                 .child(0, 1, &ui.key_label)
                 .child(0, 2, &ui.value_label)
@@ -206,8 +196,9 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         } else {
             nwg::GridLayout::builder()
                 .parent(&ui.window)
-                .max_size([400, 200])
-                .min_size([80, 60])
+                .max_size([600, 300])
+                .min_size([200, 100])
+                .max_column(Some(2))
                 .child(0, 0, &ui.is_system_label)
                 .child(0, 1, &ui.key_label)
                 .child(0, 2, &ui.value_label)
