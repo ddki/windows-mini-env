@@ -52,8 +52,41 @@
 
 :heavy_check_mark: 添加、清除右键菜单注册表;\
 :heavy_check_mark: 一键添加到``PATH``（系统级）;\
-:heavy_check_mark: 添加到已有环境变量;
+:heavy_check_mark: 添加到已有环境变量;\
 :heavy_check_mark: 新增自定义环境变量;
+
+程序启动设置：
+
+![添加、清除右键菜单注册表](./images/add_reg.png)
+
+右键菜单：
+
+![右键菜单](./images/right_menu.png)
+
+添加到当前环境变量（UI）：
+
+![添加到当前环境变量（UI）](./images/add_env.png)
+
+添加到新的环境变量（UI）：
+
+![添加到新的环境变量（UI）](./images/new_env.png)
+
+命令：
+```bash
+# .\mini_env.exe --help
+mini_env 0.0.1
+
+USAGE:
+    mini_env.exe [OPTIONS]
+
+OPTIONS:
+    -h, --help                 Print help information
+    -k, --key <KEY>
+    -m, --mode <MODE>
+    -o, --operate <OPERATE>
+    -v, --value <VALUE>
+    -V, --version              Print version information
+```
 
 ## :rocket: Technologies ##
 
