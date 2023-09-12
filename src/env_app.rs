@@ -10,6 +10,7 @@ use winreg::{
 #[derive(Default)]
 pub struct EnvNewApp {
     pub operate: String,
+    pub value: String,
 
     window: nwg::Window,
     layout: nwg::GridLayout,
@@ -75,6 +76,7 @@ impl EnvNewApp {
             }
         }
         nwg::modal_info_message(&self.window, "info", "保存成功");
+        nwg::stop_thread_dispatch();
     }
     fn close_window(&self) {
         // nwg::modal_info_message(&self.window, "close", "关闭窗口");
@@ -125,8 +127,9 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
 
         let show_key_select = "modify" == data.operate;
         if show_key_select {
-            let mut env_keys: Vec<String> = Vec::new();
-            env_keys.push("PATH".to_string());
+            let env_keys: Vec<String> = std::env::vars().map(|(key, _)| key).collect();
+            // let mut env_keys: Vec<String> = Vec::new();
+            // env_keys.push("PATH".to_string());
             nwg::ComboBox::builder()
                 .collection(env_keys)
                 .selected_index(Some(0))
@@ -139,6 +142,7 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         }
 
         nwg::TextInput::builder()
+            .text(&data.value)
             .parent(&data.window)
             .build(&mut data.value_input)?;
 
