@@ -91,7 +91,7 @@ $ cargo run
 This project is under license from GPL-3.0. For more details, see the [LICENSE](LICENSE) file.
 
 
-Made with :heart: by <a href="https://github.com/ddki" target="_blank">{{YOUR_NAME}}</a>
+Made with :heart: by <a href="https://github.com/ddki" target="_blank">ddki</a>
 
 &#xa0;
 
