@@ -93,6 +93,12 @@ OPTIONS:
 
 [Release](https://github.com/ddki/windows-mini-env/releases)
 
+请右击选择“以管理员身份运行”或者在兼容性选项中勾选“以管理员身份运行此程序”
+
+![右击选择“以管理员身份运行”](./images/run_.jpg)
+
+![在兼容性选项中勾选“以管理员身份运行此程序”](./images/run_setting.jpg)
+
 ## :rocket: Technologies ##
 
 The following tools were used in this project:
