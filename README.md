@@ -1,5 +1,5 @@
 <div align="center" id="top"> 
-  <img src="./.github/app.gif" alt="Mini Env" />
+  <img src="./asset/icon.ico" alt="Mini Env" />
 
   &#xa0;
 
@@ -35,6 +35,7 @@
 <p align="center">
   <a href="#dart-about">About</a> &#xa0; | &#xa0; 
   <a href="#sparkles-features">Features</a> &#xa0; | &#xa0;
+  <a href="#arrow_down-install">Install</a> &#xa0; | &#xa0;
   <a href="#rocket-technologies">Technologies</a> &#xa0; | &#xa0;
   <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
   <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
@@ -87,6 +88,10 @@ OPTIONS:
     -v, --value <VALUE>
     -V, --version              Print version information
 ```
+
+## :arrow_down: Install ##
+
+[Release](https://github.com/ddki/windows-mini-env/releases)
 
 ## :rocket: Technologies ##
 
