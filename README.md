@@ -52,13 +52,14 @@
 ## :sparkles: Features ##
 
 :heavy_check_mark: 添加、清除右键菜单注册表;\
+:heavy_check_mark: 自定义添加右键菜单;\
 :heavy_check_mark: 一键添加到``PATH``（系统级）;\
 :heavy_check_mark: 添加到已有环境变量;\
 :heavy_check_mark: 新增自定义环境变量;
 
 程序启动设置：
 
-![添加、清除右键菜单注册表](./images/add_reg.png)
+![添加、清除右键菜单注册表](./images/app-home.png)
 
 右键菜单：
 
@@ -75,7 +76,7 @@
 命令：
 ```bash
 # .\mini_env.exe --help
-mini_env 0.0.1
+mini_env 0.0.2
 
 USAGE:
     mini_env.exe [OPTIONS]

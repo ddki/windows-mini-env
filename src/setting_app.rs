@@ -149,7 +149,6 @@ impl SettingApp {
         }
 
         nwg::modal_info_message(&self.window, "提示", "注册完成");
-        nwg::stop_thread_dispatch();
     }
     fn clear_reg(&self) {
         const SUB_HKEY: &str = "Directory\\shell";
@@ -161,10 +160,8 @@ impl SettingApp {
         let app_key = "miniEnv";
         let _ = cur_cer.delete_subkey_all(app_key);
         nwg::modal_info_message(&self.window, "提示", "清理完成");
-        nwg::stop_thread_dispatch();
     }
     fn close_window(&self) {
-        // nwg::modal_info_message(&self.window, "close", "关闭窗口");
         nwg::stop_thread_dispatch();
     }
     fn add_menu(&self) {
@@ -174,6 +171,17 @@ impl SettingApp {
         };
         if self.menu_title_input.text().is_empty() {
             nwg::modal_error_message(&self.window, "错误", "请填写菜单名称");
+            return;
+        }
+        let env_keys: Vec<String> = std::env::vars()
+            .map(|(key, _)| key.to_uppercase())
+            .collect();
+        if !env_keys.contains(&self.env_name_input.text().to_uppercase()) {
+            nwg::modal_error_message(
+                &self.window,
+                "错误",
+                &format!("环境变量 {} 不存在", self.env_name_input.text()),
+            );
             return;
         }
         // 添加右键菜单
@@ -240,6 +248,11 @@ impl SettingApp {
                 let _ = sub_shell_command_cer.set_value("", &sub_shell.get_command());
             }
         }
+        nwg::modal_info_message(
+            &self.window,
+            "提示",
+            &format!("已将 {} 添加到右键菜单", self.menu_title_input.text()),
+        );
     }
 }
 

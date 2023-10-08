@@ -26,7 +26,10 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    println!("args = {:#?}", args);
+    if cfg!(debug_assertions) {
+        println!("args = {:#?}", args);
+    }
+
     match args.mode {
         Some(mode) => {
             // 参数值
