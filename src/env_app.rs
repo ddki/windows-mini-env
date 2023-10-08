@@ -96,25 +96,25 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         // ui
         nwg::Window::builder()
             .flags(nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE)
-            .size((400, 200))
+            .size((400, 160))
             .position((300, 300))
             .title("设置环境变量")
             .build(&mut data.window)?;
 
         nwg::Label::builder()
-            .text("系统环境变量：")
+            .text("系统级：")
             .h_align(nwg::HTextAlign::Right)
             .parent(&data.window)
             .build(&mut data.is_system_label)?;
 
         nwg::Label::builder()
-            .text("环境变量名称：")
+            .text("名称：")
             .h_align(nwg::HTextAlign::Right)
             .parent(&data.window)
             .build(&mut data.key_label)?;
 
         nwg::Label::builder()
-            .text("环境变量值：")
+            .text("值：")
             .h_align(nwg::HTextAlign::Right)
             .parent(&data.window)
             .build(&mut data.value_label)?;
@@ -127,7 +127,9 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
 
         let show_key_select = "modify" == data.operate;
         if show_key_select {
-            let env_keys: Vec<String> = std::env::vars().map(|(key, _)| key).collect();
+            // 打开注册表
+            let mut env_keys: Vec<String> = std::env::vars().map(|(key, _)| key).collect();
+            env_keys.sort();
             // let mut env_keys: Vec<String> = Vec::new();
             // env_keys.push("PATH".to_string());
             nwg::ComboBox::builder()
@@ -186,30 +188,38 @@ impl NativeUi<EnvNewAppUi> for EnvNewApp {
         if show_key_select {
             nwg::GridLayout::builder()
                 .parent(&ui.window)
-                .max_size([600, 300])
-                .min_size([200, 100])
-                .max_column(Some(2))
-                .child(0, 0, &ui.is_system_label)
-                .child(0, 1, &ui.key_label)
-                .child(0, 2, &ui.value_label)
-                .child(1, 0, &ui.is_system_input)
-                .child(1, 1, &ui.key_select)
-                .child(1, 2, &ui.value_input)
-                .child(1, 3, &ui.save_btn)
+                .spacing(2)
+                // label
+                .child_item(nwg::GridLayoutItem::new(&ui.is_system_label, 0, 0, 1, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.key_label, 0, 1, 1, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.value_label, 0, 2, 1, 1))
+                // .child(0, 0, &ui.is_system_label)
+                // .child(0, 1, &ui.key_label)
+                // .child(0, 2, &ui.value_label)
+                // input
+                .child_item(nwg::GridLayoutItem::new(&ui.is_system_input, 1, 0, 3, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.key_select, 1, 1, 3, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.value_input, 1, 2, 3, 1))
+                // button
+                .child_item(nwg::GridLayoutItem::new(&ui.save_btn, 0, 3, 4, 2))
                 .build(&ui.layout)?;
         } else {
             nwg::GridLayout::builder()
                 .parent(&ui.window)
-                .max_size([600, 300])
-                .min_size([200, 100])
-                .max_column(Some(2))
-                .child(0, 0, &ui.is_system_label)
-                .child(0, 1, &ui.key_label)
-                .child(0, 2, &ui.value_label)
-                .child(1, 0, &ui.is_system_input)
-                .child(1, 1, &ui.key_input)
-                .child(1, 2, &ui.value_input)
-                .child(1, 3, &ui.save_btn)
+                .spacing(2)
+                // label
+                .child_item(nwg::GridLayoutItem::new(&ui.is_system_label, 0, 0, 1, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.key_label, 0, 1, 1, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.value_label, 0, 2, 1, 1))
+                // .child(0, 0, &ui.is_system_label)
+                // .child(0, 1, &ui.key_label)
+                // .child(0, 2, &ui.value_label)
+                // input
+                .child_item(nwg::GridLayoutItem::new(&ui.is_system_input, 1, 0, 3, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.key_input, 1, 1, 3, 1))
+                .child_item(nwg::GridLayoutItem::new(&ui.value_input, 1, 2, 3, 1))
+                // button
+                .child_item(nwg::GridLayoutItem::new(&ui.save_btn, 0, 3, 4, 2))
                 .build(&ui.layout)?;
         }
 

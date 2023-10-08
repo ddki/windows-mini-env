@@ -1,7 +1,7 @@
 extern crate native_windows_gui as nwg;
 use std::{cell::RefCell, env, ops::Deref, rc::Rc};
 
-use nwg::{CheckBoxState, NativeUi};
+use nwg::NativeUi;
 use winreg::{
     enums::{HKEY_CLASSES_ROOT, KEY_ALL_ACCESS},
     RegKey,
@@ -48,84 +48,93 @@ pub struct SettingApp {
     window: nwg::Window,
     layout: nwg::GridLayout,
 
-    add_right_click_menu_label: nwg::Label,
-    key_select_label: nwg::Label,
-
-    add_right_click_menu_input: nwg::CheckBox,
     key_select_input: nwg::TextInput,
 
-    save_btn: nwg::Button,
+    save_reg_btn: nwg::Button,
     clear_reg_btn: nwg::Button,
+
+    spilter_label: nwg::Label,
+    env_name_input: nwg::TextInput,
+    menu_title_input: nwg::TextInput,
+    add_menu_btn: nwg::Button,
 }
 
 impl SettingApp {
-    fn save(&self) {
+    fn save_reg_btn(&self) {
         // 添加右键菜单
-        let add_right_click_menu =
-            self.add_right_click_menu_input.check_state() == CheckBoxState::Checked;
-        if add_right_click_menu {
-            const SUB_HKEY: &str = "Directory\\shell";
-            // 打开注册表
-            let hklm = RegKey::predef(HKEY_CLASSES_ROOT);
-            let cur_cer = hklm
-                .open_subkey_with_flags(SUB_HKEY, KEY_ALL_ACCESS)
+        const SUB_HKEY: &str = "Directory\\shell";
+        // 打开注册表
+        let hklm = RegKey::predef(HKEY_CLASSES_ROOT);
+        let cur_cer = hklm
+            .open_subkey_with_flags(SUB_HKEY, KEY_ALL_ACCESS)
+            .unwrap();
+        let app_key = "miniEnv";
+        if cur_cer.create_subkey(app_key).is_ok() {
+            let env_cer = hklm
+                .open_subkey_with_flags(format!("{}\\{}", SUB_HKEY, app_key), KEY_ALL_ACCESS)
                 .unwrap();
-            let app_key = "miniEnv";
-            if cur_cer.create_subkey(app_key).is_ok() {
-                let env_cer = hklm
-                    .open_subkey_with_flags(format!("{}\\{}", SUB_HKEY, app_key), KEY_ALL_ACCESS)
-                    .unwrap();
 
-                // 获取程序路径
-                let exe_path =
-                    env::current_exe().expect("Failed to retrieve the current executable path");
-                let exe_path_str = exe_path.to_string_lossy();
-                // 设置程序变量
-                let _ = env_cer.set_value("select_keys", &self.key_select_input.text());
-                // 设置名称
-                let _ = env_cer.set_value("MUIVerb", &"Mini Env");
-                // 设置图标
-                let _ = env_cer.set_value("Icon", &exe_path_str.to_string());
-                // 开启2级菜单
-                let _ = env_cer.set_value("SubCommands", &"");
+            // 获取程序路径
+            let exe_path =
+                env::current_exe().expect("Failed to retrieve the current executable path");
+            let exe_path_str = exe_path.to_string_lossy();
+            // 设置程序变量
+            let _ = env_cer.set_value("select_keys", &self.key_select_input.text());
+            // 设置名称
+            let _ = env_cer.set_value("MUIVerb", &"Mini Env");
+            // 设置图标
+            let _ = env_cer.set_value("Icon", &exe_path_str.to_string());
+            // 开启2级菜单
+            let _ = env_cer.set_value("SubCommands", &"");
 
-                // 2级菜单命令
-                let mut sub_command1 = MyCommand::default();
-                sub_command1.set_name("add_to_path");
-                sub_command1.set_title("添加到PATH环境变量");
-                sub_command1.set_command(&format!(
-                    "{} --mode cmd --operate modify --key PATH --value %1",
-                    exe_path_str
-                ));
-                sub_command1.set_icon(&exe_path_str.to_string());
+            // 2级菜单命令
+            let mut sub_command1 = MyCommand::default();
+            sub_command1.set_name("add_to_path");
+            sub_command1.set_title("添加到PATH环境变量");
+            sub_command1.set_command(&format!(
+                "{} --mode cmd --operate modify --key PATH --value %1",
+                exe_path_str
+            ));
+            sub_command1.set_icon(&exe_path_str.to_string());
 
-                let mut sub_command2 = MyCommand::default();
-                sub_command2.set_name("add_to_current_UI");
-                sub_command2.set_title("添加到当前环境变量(ui)");
-                sub_command2.set_command(&format!(
-                    "{} --mode ui --operate modify --value %1",
-                    exe_path_str
-                ));
-                sub_command2.set_icon(&exe_path_str.to_string());
+            let mut sub_command2 = MyCommand::default();
+            sub_command2.set_name("add_to_current_UI");
+            sub_command2.set_title("添加到当前环境变量(ui)");
+            sub_command2.set_command(&format!(
+                "{} --mode ui --operate modify --value %1",
+                exe_path_str
+            ));
+            sub_command2.set_icon(&exe_path_str.to_string());
 
-                let mut sub_command3 = MyCommand::default();
-                sub_command3.set_name("add_to_new_UI");
-                sub_command3.set_title("添加到新的环境变量(ui)");
-                sub_command3.set_command(&format!(
-                    "{} --mode ui --operate new --value %1",
-                    exe_path_str
-                ));
-                sub_command3.set_icon(&exe_path_str.to_string());
+            let mut sub_command3 = MyCommand::default();
+            sub_command3.set_name("add_to_new_UI");
+            sub_command3.set_title("添加到新的环境变量(ui)");
+            sub_command3.set_command(&format!(
+                "{} --mode ui --operate new --value %1",
+                exe_path_str
+            ));
+            sub_command3.set_icon(&exe_path_str.to_string());
 
-                for sub_shell in [sub_command1, sub_command2, sub_command3] {
-                    if env_cer
-                        .create_subkey(format!("shell\\{}", sub_shell.get_name()))
-                        .is_ok()
-                    {
-                        let sub_shell_cer = hklm
+            for sub_shell in [sub_command1, sub_command2, sub_command3] {
+                if env_cer
+                    .create_subkey(format!("shell\\{}", sub_shell.get_name()))
+                    .is_ok()
+                {
+                    let sub_shell_cer = hklm
+                        .open_subkey_with_flags(
+                            format!("{}\\{}\\shell\\{}", SUB_HKEY, app_key, sub_shell.get_name()),
+                            KEY_ALL_ACCESS,
+                        )
+                        .unwrap();
+                    // 设置名称
+                    let _ = sub_shell_cer.set_value("MUIVerb", &sub_shell.get_title());
+                    // 设置图标
+                    let _ = sub_shell_cer.set_value("Icon", &sub_shell.get_icon());
+                    if sub_shell_cer.create_subkey("command").is_ok() {
+                        let sub_shell_command_cer = hklm
                             .open_subkey_with_flags(
                                 format!(
-                                    "{}\\{}\\shell\\{}",
+                                    "{}\\{}\\shell\\{}\\command",
                                     SUB_HKEY,
                                     app_key,
                                     sub_shell.get_name()
@@ -133,29 +142,13 @@ impl SettingApp {
                                 KEY_ALL_ACCESS,
                             )
                             .unwrap();
-                        // 设置名称
-                        let _ = sub_shell_cer.set_value("MUIVerb", &sub_shell.get_title());
-                        // 设置图标
-                        let _ = sub_shell_cer.set_value("Icon", &sub_shell.get_icon());
-                        if sub_shell_cer.create_subkey("command").is_ok() {
-                            let sub_shell_command_cer = hklm
-                                .open_subkey_with_flags(
-                                    format!(
-                                        "{}\\{}\\shell\\{}\\command",
-                                        SUB_HKEY,
-                                        app_key,
-                                        sub_shell.get_name()
-                                    ),
-                                    KEY_ALL_ACCESS,
-                                )
-                                .unwrap();
-                            let _ = sub_shell_command_cer.set_value("", &sub_shell.get_command());
-                        }
+                        let _ = sub_shell_command_cer.set_value("", &sub_shell.get_command());
                     }
                 }
             }
         }
-        nwg::modal_info_message(&self.window, "info", "保存成功");
+
+        nwg::modal_info_message(&self.window, "提示", "注册完成");
         nwg::stop_thread_dispatch();
     }
     fn clear_reg(&self) {
@@ -167,12 +160,86 @@ impl SettingApp {
             .unwrap();
         let app_key = "miniEnv";
         let _ = cur_cer.delete_subkey_all(app_key);
-        nwg::modal_info_message(&self.window, "info", "清除成功");
+        nwg::modal_info_message(&self.window, "提示", "清理完成");
         nwg::stop_thread_dispatch();
     }
     fn close_window(&self) {
         // nwg::modal_info_message(&self.window, "close", "关闭窗口");
         nwg::stop_thread_dispatch();
+    }
+    fn add_menu(&self) {
+        if self.env_name_input.text().is_empty() {
+            nwg::modal_error_message(&self.window, "错误", "请填写环境变量名称");
+            return;
+        };
+        if self.menu_title_input.text().is_empty() {
+            nwg::modal_error_message(&self.window, "错误", "请填写菜单名称");
+            return;
+        }
+        // 添加右键菜单
+        const SUB_HKEY: &str = "Directory\\shell";
+        // 打开注册表
+        let hklm = RegKey::predef(HKEY_CLASSES_ROOT);
+        let app_key = "miniEnv";
+
+        let env_cer = match hklm
+            .open_subkey_with_flags(format!("{}\\{}", SUB_HKEY, app_key), KEY_ALL_ACCESS)
+        {
+            Ok(cer) => cer,
+            Err(_e) => {
+                nwg::modal_error_message(&self.window, "错误", "请先注册右键菜单");
+                return;
+            }
+        };
+
+        // 获取程序路径
+        let exe_path = env::current_exe().expect("Failed to retrieve the current executable path");
+        let exe_path_str = exe_path.to_string_lossy();
+
+        // 2级菜单命令
+        let mut sub_command = MyCommand::default();
+        sub_command.set_name(&format!(
+            "add_to_{}",
+            self.env_name_input.text().to_lowercase()
+        ));
+        sub_command.set_title(&self.menu_title_input.text());
+        sub_command.set_command(&format!(
+            "{} --mode cmd --operate modify --key {} --value %1",
+            exe_path_str,
+            self.env_name_input.text()
+        ));
+        sub_command.set_icon(&exe_path_str.to_string());
+
+        let sub_shell = sub_command;
+        if env_cer
+            .create_subkey(format!("shell\\{}", sub_shell.get_name()))
+            .is_ok()
+        {
+            let sub_shell_cer = hklm
+                .open_subkey_with_flags(
+                    format!("{}\\{}\\shell\\{}", SUB_HKEY, app_key, sub_shell.get_name()),
+                    KEY_ALL_ACCESS,
+                )
+                .unwrap();
+            // 设置名称
+            let _ = sub_shell_cer.set_value("MUIVerb", &sub_shell.get_title());
+            // 设置图标
+            let _ = sub_shell_cer.set_value("Icon", &sub_shell.get_icon());
+            if sub_shell_cer.create_subkey("command").is_ok() {
+                let sub_shell_command_cer = hklm
+                    .open_subkey_with_flags(
+                        format!(
+                            "{}\\{}\\shell\\{}\\command",
+                            SUB_HKEY,
+                            app_key,
+                            sub_shell.get_name()
+                        ),
+                        KEY_ALL_ACCESS,
+                    )
+                    .unwrap();
+                let _ = sub_shell_command_cer.set_value("", &sub_shell.get_command());
+            }
+        }
     }
 }
 
@@ -187,45 +254,50 @@ impl NativeUi<SettingAppUi> for SettingApp {
 
         // ui
         nwg::Window::builder()
-            .flags(nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE)
-            .size((400, 140))
+            .flags(
+                nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE | nwg::WindowFlags::RESIZABLE,
+            )
+            .size((420, 300))
             .position((300, 300))
             .title("MiniEnv设置")
             .build(&mut data.window)?;
 
-        nwg::Label::builder()
-            .text("添加到右键菜单：")
-            .h_align(nwg::HTextAlign::Right)
-            .parent(&data.window)
-            .build(&mut data.add_right_click_menu_label)?;
-
-        nwg::Label::builder()
-            .text("环境变量选择名称：")
-            .h_align(nwg::HTextAlign::Right)
-            .parent(&data.window)
-            .build(&mut data.key_select_label)?;
-
-        nwg::CheckBox::builder()
-            .text("")
-            .check_state(nwg::CheckBoxState::Checked)
-            .parent(&data.window)
-            .build(&mut data.add_right_click_menu_input)?;
-
         nwg::TextInput::builder()
             .parent(&data.window)
-            .placeholder_text(Some("多个使用半角逗号隔开"))
-            .readonly(true)
+            .placeholder_text(Some("环境变量下拉选择名称，多个使用半角逗号隔开"))
             .build(&mut data.key_select_input)?;
 
         nwg::Button::builder()
-            .text("保存")
+            .text("注册右键菜单")
             .parent(&data.window)
-            .build(&mut data.save_btn)?;
+            .build(&mut data.save_reg_btn)?;
 
         nwg::Button::builder()
-            .text("清除注册表")
+            .text("清理注册表")
             .parent(&data.window)
             .build(&mut data.clear_reg_btn)?;
+
+        nwg::Label::builder()
+            .text("")
+            .h_align(nwg::HTextAlign::Center)
+            .background_color(Some([252, 30, 30]))
+            .parent(&data.window)
+            .build(&mut data.spilter_label)?;
+
+        nwg::TextInput::builder()
+            .parent(&data.window)
+            .placeholder_text(Some("环境变量名称"))
+            .build(&mut data.env_name_input)?;
+
+        nwg::TextInput::builder()
+            .parent(&data.window)
+            .placeholder_text(Some("右键菜单名称"))
+            .build(&mut data.menu_title_input)?;
+
+        nwg::Button::builder()
+            .text("添加右键菜单")
+            .parent(&data.window)
+            .build(&mut data.add_menu_btn)?;
 
         // Wrap-up
         let ui = SettingAppUi {
@@ -239,11 +311,14 @@ impl NativeUi<SettingAppUi> for SettingApp {
             if let Some(evt_ui) = evt_ui.upgrade() {
                 match evt {
                     E::OnButtonClick => {
-                        if &handle == &evt_ui.save_btn {
-                            SettingApp::save(&evt_ui);
+                        if &handle == &evt_ui.save_reg_btn {
+                            SettingApp::save_reg_btn(&evt_ui);
                         }
                         if &handle == &evt_ui.clear_reg_btn {
                             SettingApp::clear_reg(&evt_ui);
+                        }
+                        if &handle == &evt_ui.add_menu_btn {
+                            SettingApp::add_menu(&evt_ui);
                         }
                     }
                     E::OnWindowClose => {
@@ -264,15 +339,14 @@ impl NativeUi<SettingAppUi> for SettingApp {
         // Layouts
         nwg::GridLayout::builder()
             .parent(&ui.window)
-            .max_size([600, 300])
-            .min_size([200, 100])
-            .max_column(Some(2))
-            .child(0, 0, &ui.add_right_click_menu_label)
-            .child(0, 1, &ui.key_select_label)
-            .child(0, 2, &ui.save_btn)
-            .child(1, 0, &ui.add_right_click_menu_input)
-            .child(1, 1, &ui.key_select_input)
-            .child(1, 2, &ui.clear_reg_btn)
+            .spacing(2)
+            .child(0, 0, &ui.key_select_input)
+            .child(0, 1, &ui.save_reg_btn)
+            .child(0, 2, &ui.clear_reg_btn)
+            .child(0, 3, &ui.spilter_label)
+            .child(0, 4, &ui.env_name_input)
+            .child(0, 5, &ui.menu_title_input)
+            .child(0, 6, &ui.add_menu_btn)
             .build(&ui.layout)?;
 
         return Ok(ui);
