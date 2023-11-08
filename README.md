@@ -9,19 +9,37 @@
 <h1 align="center">Mini Env</h1>
 
 <p align="center">
-  <img alt="Github top language" src="https://img.shields.io/github/languages/top/ddki/windows-mini-env">
+  <a href="https://github.com/ddki/windows-mini-env/releases">
+    <img alt="Github replease" src="https://img.shields.io/github/release/ddki/windows-mini-env">
+  </a>
 
-  <img alt="Github language count" src="https://img.shields.io/github/languages/count/ddki/windows-mini-env">
+  <a href="#">
+    <img alt="Github top language" src="https://img.shields.io/github/languages/top/ddki/windows-mini-env">
+  </a>
 
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/ddki/windows-mini-env">
+  <a href="#">
+    <img alt="Github language count" src="https://img.shields.io/github/languages/count/ddki/windows-mini-env">
+  </a>
 
-  <img alt="License" src="https://img.shields.io/github/license/ddki/windows-mini-env">
+  <a href="#">
+    <img alt="Repository size" src="https://img.shields.io/github/repo-size/ddki/windows-mini-env">
+  </a>
 
-  <!-- <img alt="Github issues" src="https://img.shields.io/github/issues/ddki/windows-mini-env" /> -->
+  <a href="https://github.com/ddki/windows-mini-env/blob/master/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/ddki/windows-mini-env">
+  </a>
 
-  <!-- <img alt="Github forks" src="https://img.shields.io/github/forks/ddki/windows-mini-env" /> -->
+  <a href="https://github.com/ddki/windows-mini-env/issues">
+    <img alt="Github issues" src="https://img.shields.io/github/issues/ddki/windows-mini-env" />
+  </a>
 
-  <!-- <img alt="Github stars" src="https://img.shields.io/github/stars/ddki/windows-mini-env" /> -->
+  <a href="https://github.com/ddki/windows-mini-env/forks">
+    <img alt="Github forks" src="https://img.shields.io/github/forks/ddki/windows-mini-env" />
+  </a>
+
+  <a href="https://github.com/ddki/windows-mini-env/stargazers">
+    <img alt="Github stars" src="https://img.shields.io/github/stars/ddki/windows-mini-env" />
+  </a>
 </p>
 
 <!-- Status -->
